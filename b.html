@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+        let getType = (data) =>
+        Object.prototype.toString
+          .call(data)
+          .match(/\[object (.*)\]/)[1]
+          .toLocaleLowerCase();
+      const transformationType = (data, key = "", map = new Map()) => {
+        if (typeof data === "object" && map.has(data)) return map.get(data);
+        const result = { key, type: "" };
+        map.set(data, result);
+        const type = getType(data);
+        if (type === "string") {
+          result.type = data.split("|").map((item) => item.trim());
+        } else if (type === "object") {
+          result.type = "object";
+          result.value = Object.keys(data).map((key) => {
+            return transformationType(data[key], key, map);
+          });
+        } else if (type === "array") {
+          result.type = "array";
+          result.value = data[0]
+            ? transformationType(data[0], "", map)
+            : undefined;
+        } else if (type === "function") {
+          const functionResult = data();
+          result.type = "union";
+          result.value = functionResult.map((item) => {
+            return transformationType(item, "", map);
+          });
+        } else {
+          result.type = [data];
+        }
+
+        return result;
+      };
+
+      const quality = {
+        type: "string",
+        title: "string",
+        geometry: {
+          //   type: "point",
+          type: "string",
+          coordinates: ["number"],
+        },
+        properties: {
+          id: "number",
+          objectId: "number",
+          errorType: [],
+        },
+        // 是否修改
+        isModified: () => [undefined, true],
+      };
+
+      console.log(transformationType(quality));
+    </script>
+  </body>
+</html>
