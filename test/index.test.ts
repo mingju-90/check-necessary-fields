@@ -1,5 +1,6 @@
 import checkNecessaryFields from '../src/index' 
 import markData from './markData'
+import people from './people'
 
 
 
@@ -15,7 +16,7 @@ test('checkNecessaryFields: 基本数据类型', () => {
 })
 
 
-test('checkNecessaryFields: 字符串枚举值', () => {
+test('checkNecessaryFields: 字符串联合类型', () => {
   expect(checkNecessaryFields('a | b | c', 'a')).toBe(true)
   expect(checkNecessaryFields('a | b | c', 'd')).toBe(false)
 })
@@ -41,4 +42,5 @@ test('checkNecessaryFields: 字符串枚举值', () => {
 
 test('checkNecessaryFields: 复杂数据', () => {
     expect(checkNecessaryFields(markData.dataType, markData.data)).toBe(true)
+    expect(checkNecessaryFields(people.peopleType, people.a)).toBe(true)
 })

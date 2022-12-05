@@ -37,6 +37,8 @@ const transformationType = (data: any, key = "", map = new Map()): ITransformati
   return result;
 };
 
+
+// TODO: 循环引用数据校验优化
 const check = (checkData: ITransformationType, data: any): boolean => {
   const dataType = getType(data);
   // 如果是 type 是数组, 代表 data 应该是基础数据类型, 直接判断
