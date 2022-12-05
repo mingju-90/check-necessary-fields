@@ -71,7 +71,7 @@ const quality = {
 };
 
 /** 标注结果数据结构 */
-const dataType = {
+export const dataType = {
   // 图形质检数据
   qualityResult: {
     type: "string",
@@ -109,7 +109,7 @@ const dataType = {
   },
 };
 
-const data = {
+export const data = {
   qualityResult: {
     type: "FeatureCollection",
     features: [
@@ -559,7 +559,9 @@ const data = {
   },
 };
 
-modules.exports = {
-    dataType,
-    data
+export default {
+  data,
+  dataType
 }
+
+
