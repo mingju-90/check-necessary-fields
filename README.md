@@ -36,6 +36,52 @@ checkNecessaryFields('number', 123) // true
 checkNecessaryFields('number', 0) // true
 checkNecessaryFields('number', NaN) // false
 ```
+
+### 指定值和联合类型
+```js
+const Point = {
+    type: 'Point',
+    coordinates: ['number']
+}
+const Line = {
+    type: 'Line'
+    coordinates: [
+        ['number']
+    ]
+}
+
+// 点或者线
+const PointAndLine = () => [Point, Line]
+
+const point = {
+    type: 'Point',
+    coordinates: [100, 100]
+}
+
+checkNecessaryFields(Point, point) // true
+checkNecessaryFields(PointAndLine, point) // true
+
+// 修改点坐标的结构
+point.coordinates = [
+    [100, 100]
+]
+checkNecessaryFields(PointAndLine, point) // false
+
+// 修改点的类型为line
+point.type = 'Line'
+// 先校验点的类型不通过，然后校验线的类型，通过
+checkNecessaryFields(PointAndLine, point) // true
+
+
+// 校验的值必须符合下面几个值
+const list = () => [1, 2, '3', false]
+checkNecessaryFields(list, 1) // true
+checkNecessaryFields(list, '1') // false
+checkNecessaryFields(list, '3') // true
+checkNecessaryFields(list, '') // false
+checkNecessaryFields(list, false) // true
+```
+
 ### 复杂类型
 ```js
 const peopleType = {
