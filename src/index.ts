@@ -37,9 +37,10 @@ const transformationType = (data: any, key = "", map = new Map()): ITransformati
   return result;
 };
 
+const error = []
 
 // TODO: 循环引用数据校验优化
-const check = (checkData: ITransformationType, data: any): boolean => {
+const check = (checkData: ITransformationType, data: any, errorKey: any = null): any => {
   const dataType = getType(data);
   // 如果是 type 是数组, 代表 data 应该是基础数据类型, 直接判断
 
@@ -51,13 +52,14 @@ const check = (checkData: ITransformationType, data: any): boolean => {
   } else if (checkData.type !== dataType) {
     return false;
   } else if (dataType === "object") {
-    result = (checkData.value as ITransformationType[]).every((item) => check(item, data[item.key]));
+    result = (checkData.value as ITransformationType[]).every((item, index) => check(item, data[item.key], index));
   } else if (dataType === "array") {
     result = checkData.value
-      ? data.every((item: any) => check(checkData.value as ITransformationType, item))
+      ? data.every((item: any, index: number) => check(checkData.value as ITransformationType, item, index))
       : true;
   }
-  
+  // console.log(path)
+  if(!result && errorKey !== null) error.push(!checkData.key ? errorKey : checkData.key)
   return result;
 };
 
@@ -68,7 +70,9 @@ const check = (checkData: ITransformationType, data: any): boolean => {
  */
 const checkNecessaryFields = (type: any, data: any) => {
   const typeData = transformationType(type);
-  return check(typeData, data);
+  const result = check(typeData, data)
+  if(!result) console.log(error.reverse())
+  return result;
 };
 
 
