@@ -1,6 +1,6 @@
 import getType from "./getType";
 
-
+const error: string[] = []
 interface ITransformationType  {
     key: string
     type: string | unknown[]
@@ -39,14 +39,17 @@ const transformationType = (data: any, key = "", map = new Map()): ITransformati
 
 
 
+
+
 interface CheckArgs {
   checkData: ITransformationType
   data: any
   errorKey?: any
-  error: any[]
+  // error: string[]
 }
 // TODO: 循环引用数据校验优化
-const check = ({checkData, data, errorKey, error}: CheckArgs): any => {
+// const check = (checkData: ITransformationType, data: any, errorKey: any = null): any => {
+  const check = ({checkData, data, errorKey}: CheckArgs): any => {
   const dataType = getType(data);
   // 如果是 type 是数组, 代表 data 应该是基础数据类型, 直接判断
 
@@ -54,17 +57,18 @@ const check = ({checkData, data, errorKey, error}: CheckArgs): any => {
   if (getType(checkData.type) === "array") {
     result = checkData.type.includes(dataType) || checkData.type.includes(data);
   } else if (checkData.type === "union") {
-    result = (checkData.value as ITransformationType[]).some((item) => check({checkData: item, data, error: [], errorKey: null}));
+    result = (checkData.value as ITransformationType[]).some((item) => check({checkData: item, data, errorKey: null}));
   } else if (checkData.type !== dataType) {
     return false;
   } else if (dataType === "object") {
-    result = (checkData.value as ITransformationType[]).every((item, index) => check({checkData: item, data: data[item.key], errorKey: `${index}`, error}));
+    result = (checkData.value as ITransformationType[]).every((item, index) => check({checkData: item, data: data[item.key], errorKey: `${index}`}));
   } else if (dataType === "array") {
     result = checkData.value
-      ? data.every((item: any, index: number) => check({checkData: checkData.value as ITransformationType, data: item, errorKey: `${index}`, error}))
+      ? data.every((item: any, index: number) => check({checkData: checkData.value as ITransformationType, data: item, errorKey: `${index}`}))
       : true;
   }
   if(!result && errorKey !== null) {
+    // console.log(checkData, errorKey)
     error.push(!checkData.key ? errorKey : checkData.key)
   }
   return result;
@@ -78,9 +82,9 @@ const check = ({checkData, data, errorKey, error}: CheckArgs): any => {
 const checkNecessaryFields = (type: any) => {
   const checkData = transformationType(type);
   return (data: any) => {
-    const error: string[] = []
-    const result = check({checkData, data, error, errorKey: null})
-    if(!result) console.log(error)
+    
+    const result = check({checkData, data, errorKey: null})
+    if(!result) console.log(error.reverse())
     return result || error.reverse();
   }
 };
