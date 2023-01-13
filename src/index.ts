@@ -70,23 +70,40 @@ const check = ({checkData, data, errorKey, error}: CheckArgs): any => {
   return result;
 };
 
+
+
 /**
- * 校验数据类型
+ * 校验数据类型, 一个参数, 返回校验这个类型的方法, 如果两个参数, 返回校验结果
  * @param {*} type 期望的数据类型
  * @param {*} data 需要被校验的数据
  */
-const checkNecessaryFields = (type: any) => {
+
+
+type checkFnResult = true | string[]
+type checkFn = (data: any) => checkFnResult
+
+
+interface checkNecessaryFieldsFn {
+  (type: any): checkFn;
+  (type: any, ...args: [any]): checkFnResult;
+}
+
+// @ts-ignore
+const checkNecessaryFields: checkNecessaryFieldsFn = (type, ...args) => {
   const checkData = transformationType(type);
-  return (data: any) => {
+
+  const fn: checkFn = (data: any) => {
     const error: string[] = []
     const result = check({checkData, data, error, errorKey: null})
     if(!result) console.log(error)
     return result || error.reverse();
-  }
-};
+  } 
 
+  return args.length ? fn(args[0]) : fn
+};
+  
+const a = checkNecessaryFields(1,2)
+const b = checkNecessaryFields(1)
 
 
 export default checkNecessaryFields
-
-
