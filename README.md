@@ -103,3 +103,58 @@ checkNecessaryFields(peopleType, a) // true
 a.friends = undefined
 checkNecessaryFields(peopleType, a) // false
 ```
+
+
+# V2.0.0 版本更新
+## 更新内容
+- 更新使用方式
+```js
+// 一个参数，返回对应的校验函数，适合重复使用，使用柯里化保存了校验对象，不需要重复进行格式转换
+const checkFn = checkNecessaryFields(checkType)
+checkFn(data)
+
+// 两个参数，返回校验结果
+checkNecessaryFields(checkType, data)
+```
+- 调整了返回的结果，如果校验通过，返回 true，校验不通过，返回对应属性的路径，联合类型里面的路径不返回（处理太麻烦了）
+```js
+class People {
+    name: any
+    age: any
+    friends: People[]
+    constructor({name, age}) {
+        this.name = name
+        this.age = age
+        this.friends = []
+    }
+}
+
+const peopleType: People = {
+    name: 'string',
+    age: 'number',
+    friends: []
+}
+peopleType.friends = [peopleType]
+
+
+const peopleData = new People({name: 'a', age: 11})
+const b = new People({name: 'b', age: 12})
+const c = new People({name: 'c', age: 12})
+const d = new People({name: 'd', age: '12'})
+
+peopleData.friends.push(b, c, d)
+
+checkNecessaryFields(peopleType, peopleData)  // ["friends", "2", "age"]
+```
+
+## 用例
+### 基本类型
+```js
+checkNecessaryFields('string', 'src') // true
+checkNecessaryFields('string', '') // true
+checkNecessaryFields('string', '123') // true
+checkNecessaryFields('number', '123') // []
+checkNecessaryFields('number', 123) // true
+checkNecessaryFields('number', 0) // true
+checkNecessaryFields('number', NaN) // false
+```

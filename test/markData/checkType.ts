@@ -163,7 +163,7 @@ const frameQuality = {
 const frame = {
   id: "number | undefined",
   isEffective: "1 | 0 | undefined", // 1 有效帧, 0 无效帧
-  objects: () => [undefined, [() => [mark, leaveMark]]],
+  objects:  [() => [mark, leaveMark]],
 //   objects: [() => [mark, leaveMark]],
   qualityResult: () => [undefined, qualityResult],
   quality: () => [undefined, frameQuality],
